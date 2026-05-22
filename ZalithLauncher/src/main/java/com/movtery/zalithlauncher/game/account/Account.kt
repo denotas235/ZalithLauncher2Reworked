@@ -37,6 +37,9 @@ import java.util.UUID
 
 @Entity(tableName = "accounts")
 data class Account(
+    /**
+     * 唯一 UUID，标识该账号
+     */
     @PrimaryKey
     val uniqueUUID: String = UUID.randomUUID().toString().lowercase(),
     var accessToken: String = "0",
@@ -59,9 +62,12 @@ data class Account(
 
     fun getCapeFile() = File(PathManager.DIR_ACCOUNT_CAPE, "$uniqueUUID.png")
 
-    private fun getTempSkinFile() = File(PathManager.DIR_ACCOUNT_SKIN, "$uniqueUUID.tmp.png")
-    private fun getTempCapeFile() = File(PathManager.DIR_ACCOUNT_CAPE, "$uniqueUUID.tmp.png")
+    private fun getTempSkinFile() = File(PathManager.DIR_CACHE, "account_skin_${uniqueUUID}.tmp.png")
+    private fun getTempCapeFile() = File(PathManager.DIR_CACHE, "account_cape_${uniqueUUID}.tmp.png")
 
+    /**
+     * 下载并更新账号的皮肤文件
+     */
     suspend fun downloadYggdrasil() = withContext(Dispatchers.IO) {
         val baseUrl = when {
             isMicrosoftAccount() -> "https://sessionserver.mojang.com"
@@ -69,15 +75,9 @@ data class Account(
             else -> null
         }
         baseUrl?.let { url ->
-            // Tạo thư mục nếu chưa có
-            getSkinFile().parentFile?.mkdirs()
-            getCapeFile().parentFile?.mkdirs()
-
             val skinJob = async { updateSkin(url) }
             val capeJob = async { updateCape(url) }
             joinAll(skinJob, capeJob)
-            
-            // Chỉ refresh một lần sau khi cả hai hoàn thành
             AccountsManager.refreshWardrobe()
         }
     }
