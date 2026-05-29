@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.ui.theme
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -25,8 +26,9 @@ import android.graphics.drawable.RippleDrawable
 import android.os.Build
 import android.widget.Button
 import android.widget.TextView
-import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.color.utilities.CorePalette
 import com.google.android.material.color.utilities.DynamicScheme
@@ -37,40 +39,40 @@ import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.setting.enums.DarkMode
 
 data class NativeColorScheme(
-    @field:ColorInt val primary: Int,
-    @field:ColorInt val onPrimary: Int,
-    @field:ColorInt val primaryContainer: Int,
-    @field:ColorInt val onPrimaryContainer: Int,
-    @field:ColorInt val secondary: Int,
-    @field:ColorInt val onSecondary: Int,
-    @field:ColorInt val secondaryContainer: Int,
-    @field:ColorInt val onSecondaryContainer: Int,
-    @field:ColorInt val tertiary: Int,
-    @field:ColorInt val onTertiary: Int,
-    @field:ColorInt val tertiaryContainer: Int,
-    @field:ColorInt val onTertiaryContainer: Int,
-    @field:ColorInt val error: Int,
-    @field:ColorInt val onError: Int,
-    @field:ColorInt val errorContainer: Int,
-    @field:ColorInt val onErrorContainer: Int,
-    @field:ColorInt val background: Int,
-    @field:ColorInt val onBackground: Int,
-    @field:ColorInt val surface: Int,
-    @field:ColorInt val onSurface: Int,
-    @field:ColorInt val surfaceVariant: Int,
-    @field:ColorInt val onSurfaceVariant: Int,
-    @field:ColorInt val outline: Int,
-    @field:ColorInt val outlineVariant: Int,
-    @field:ColorInt val inverseSurface: Int,
-    @field:ColorInt val inverseOnSurface: Int,
-    @field:ColorInt val inversePrimary: Int,
-    @field:ColorInt val surfaceDim: Int,
-    @field:ColorInt val surfaceBright: Int,
-    @field:ColorInt val surfaceContainerLowest: Int,
-    @field:ColorInt val surfaceContainerLow: Int,
-    @field:ColorInt val surfaceContainer: Int,
-    @field:ColorInt val surfaceContainerHigh: Int,
-    @field:ColorInt val surfaceContainerHighest: Int,
+    val primary: Color,
+    val onPrimary: Color,
+    val primaryContainer: Color,
+    val onPrimaryContainer: Color,
+    val secondary: Color,
+    val onSecondary: Color,
+    val secondaryContainer: Color,
+    val onSecondaryContainer: Color,
+    val tertiary: Color,
+    val onTertiary: Color,
+    val tertiaryContainer: Color,
+    val onTertiaryContainer: Color,
+    val error: Color,
+    val onError: Color,
+    val errorContainer: Color,
+    val onErrorContainer: Color,
+    val background: Color,
+    val onBackground: Color,
+    val surface: Color,
+    val onSurface: Color,
+    val surfaceVariant: Color,
+    val onSurfaceVariant: Color,
+    val outline: Color,
+    val outlineVariant: Color,
+    val inverseSurface: Color,
+    val inverseOnSurface: Color,
+    val inversePrimary: Color,
+    val surfaceDim: Color,
+    val surfaceBright: Color,
+    val surfaceContainerLowest: Color,
+    val surfaceContainerLow: Color,
+    val surfaceContainer: Color,
+    val surfaceContainerHigh: Color,
+    val surfaceContainerHighest: Color,
 )
 
 /**
@@ -96,6 +98,7 @@ fun getColorScheme(context: Context): NativeColorScheme {
     return buildColorScheme(seedColor, darkTheme)
 }
 
+@SuppressLint("RestrictedApi")
 private fun buildColorScheme(seedColor: Int, darkTheme: Boolean): NativeColorScheme {
     val palettes = CorePalette.of(seedColor)
 
@@ -139,49 +142,48 @@ private fun buildColorScheme(seedColor: Int, darkTheme: Boolean): NativeColorSch
     }
 
     return NativeColorScheme(
-        primary = scheme.primary,
-        onPrimary = scheme.onPrimary,
-        primaryContainer = scheme.primaryContainer,
-        onPrimaryContainer = scheme.onPrimaryContainer,
-        secondary = scheme.secondary,
-        onSecondary = scheme.onSecondary,
-        secondaryContainer = scheme.secondaryContainer,
-        onSecondaryContainer = scheme.onSecondaryContainer,
-        tertiary = scheme.tertiary,
-        onTertiary = scheme.onTertiary,
-        tertiaryContainer = scheme.tertiaryContainer,
-        onTertiaryContainer = scheme.onTertiaryContainer,
-        error = scheme.error,
-        onError = scheme.onError,
-        errorContainer = scheme.errorContainer,
-        onErrorContainer = scheme.onErrorContainer,
-        background = scheme.background,
-        onBackground = scheme.onBackground,
-        surface = scheme.surface,
-        onSurface = scheme.onSurface,
-        surfaceVariant = scheme.surfaceVariant,
-        onSurfaceVariant = scheme.onSurfaceVariant,
-        outline = scheme.outline,
-        outlineVariant = scheme.outlineVariant,
-        inverseSurface = scheme.inverseSurface,
-        inverseOnSurface = scheme.inverseOnSurface,
-        inversePrimary = scheme.inversePrimary,
-        surfaceDim = surfaceDim,
-        surfaceBright = surfaceBright,
-        surfaceContainerLowest = surfaceContainerLowest,
-        surfaceContainerLow = surfaceContainerLow,
-        surfaceContainer = surfaceContainer,
-        surfaceContainerHigh = surfaceContainerHigh,
-        surfaceContainerHighest = surfaceContainerHighest,
+        primary = Color(scheme.primary),
+        onPrimary = Color(scheme.onPrimary),
+        primaryContainer = Color(scheme.primaryContainer),
+        onPrimaryContainer = Color(scheme.onPrimaryContainer),
+        secondary = Color(scheme.secondary),
+        onSecondary = Color(scheme.onSecondary),
+        secondaryContainer = Color(scheme.secondaryContainer),
+        onSecondaryContainer = Color(scheme.onSecondaryContainer),
+        tertiary = Color(scheme.tertiary),
+        onTertiary = Color(scheme.onTertiary),
+        tertiaryContainer = Color(scheme.tertiaryContainer),
+        onTertiaryContainer = Color(scheme.onTertiaryContainer),
+        error = Color(scheme.error),
+        onError = Color(scheme.onError),
+        errorContainer = Color(scheme.errorContainer),
+        onErrorContainer = Color(scheme.onErrorContainer),
+        background = Color(scheme.background),
+        onBackground = Color(scheme.onBackground),
+        surface = Color(scheme.surface),
+        onSurface = Color(scheme.onSurface),
+        surfaceVariant = Color(scheme.surfaceVariant),
+        onSurfaceVariant = Color(scheme.onSurfaceVariant),
+        outline = Color(scheme.outline),
+        outlineVariant = Color(scheme.outlineVariant),
+        inverseSurface = Color(scheme.inverseSurface),
+        inverseOnSurface = Color(scheme.inverseOnSurface),
+        inversePrimary = Color(scheme.inversePrimary),
+        surfaceDim = Color(surfaceDim),
+        surfaceBright = Color(surfaceBright),
+        surfaceContainerLowest = Color(surfaceContainerLowest),
+        surfaceContainerLow = Color(surfaceContainerLow),
+        surfaceContainer = Color(surfaceContainer),
+        surfaceContainerHigh = Color(surfaceContainerHigh),
+        surfaceContainerHighest = Color(surfaceContainerHighest),
     )
 }
 
 private fun getSeedColor(context: Context, darkTheme: Boolean): Int {
     return when (AllSettings.launcherColorTheme.state) {
         ColorThemeType.DYNAMIC -> {
-            val ver = Build.VERSION.SDK_INT
-            if (ver >= Build.VERSION_CODES.S) {
-                if (ver >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     if (darkTheme) {
                         context.resources.getColor(android.R.color.system_primary_dark, context.theme)
                     } else {
@@ -212,32 +214,31 @@ private fun getPredefinedSeedColor(theme: ColorThemeType, darkTheme: Boolean): I
     }
 }
 
-private fun Button.applyThemeColors(
-    colors: NativeColorScheme,
-) {
-    setTextColor(colors.primary)
-    if (this is MaterialButton) {
-        rippleColor = ColorStateList.valueOf(colors.primary)
-    } else {
-        (background as? RippleDrawable)?.setColor(ColorStateList.valueOf(colors.primary))
-    }
-}
-
 fun MaterialAlertDialogBuilder.showThemed(): AlertDialog {
-    val dialog = create()
-    val colors = getColorScheme(dialog.context)
+    val colors = getColorScheme(context)
+    background?.setTint(colors.surfaceContainerHigh.toArgb())
 
-    dialog.setOnShowListener {
-        dialog.window?.apply {
-            background?.setTint(colors.surface)
+    fun Button.applyThemeColors(
+        colors: NativeColorScheme,
+    ) {
+        val contentColor = colors.primary.toArgb()
+        val rippleColor = colors.secondaryContainer.copy(alpha = 0.5f).toArgb()
+
+        this@applyThemeColors.setTextColor(contentColor)
+        if (this is MaterialButton) {
+            this@applyThemeColors.rippleColor = ColorStateList.valueOf(rippleColor)
+        } else {
+            (this@applyThemeColors.background as? RippleDrawable)?.setColor(ColorStateList.valueOf(rippleColor))
         }
-        dialog.findViewById<TextView>(androidx.appcompat.R.id.alertTitle)?.setTextColor(colors.onSurface)
-        dialog.findViewById<TextView>(android.R.id.message)?.setTextColor(colors.onSurfaceVariant)
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.applyThemeColors(colors)
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.applyThemeColors(colors)
-        dialog.getButton(AlertDialog.BUTTON_NEUTRAL)?.applyThemeColors(colors)
     }
 
-    dialog.show()
-    return dialog
+    return create().apply {
+        setOnShowListener {
+            findViewById<TextView>(androidx.appcompat.R.id.alertTitle)?.setTextColor(colors.onSurface.toArgb())
+            findViewById<TextView>(android.R.id.message)?.setTextColor(colors.onSurfaceVariant.toArgb())
+            getButton(AlertDialog.BUTTON_POSITIVE)?.applyThemeColors(colors)
+            getButton(AlertDialog.BUTTON_NEGATIVE)?.applyThemeColors(colors)
+            getButton(AlertDialog.BUTTON_NEUTRAL)?.applyThemeColors(colors)
+        }
+    }.also { it.show() }
 }
