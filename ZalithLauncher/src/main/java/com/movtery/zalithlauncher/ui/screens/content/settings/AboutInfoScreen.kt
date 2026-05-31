@@ -121,7 +121,7 @@ fun AboutInfoScreen(
                         )
 
                         ButtonIconItem(
-                            icon = painterResource(R.drawable.img_movtery),
+                            icon = painterResource(R.drawable.img_avatar_movtery),
                             title = stringResource(R.string.about_launcher_author_movtery_title),
                             text = stringResource(R.string.about_launcher_author_movtery_text, BuildKeys.LAUNCHER_NAME),
                             button = {
@@ -143,12 +143,12 @@ fun AboutInfoScreen(
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         ButtonIconItem(
-                            icon = painterResource(R.drawable.img_bangbang93),
+                            icon = painterResource(R.drawable.img_avatar_bangbang93),
                             title = "bangbang93",
                             text = stringResource(R.string.about_acknowledgements_bangbang93_text, BuildKeys.LAUNCHER_SHORT_NAME),
                             button = {
                                 Button(
-                                    onClick = { openLink("https://afdian.com/a/bangbang93") }
+                                    onClick = { openLink("https://ifdian.net/a/bangbang93") }
                                 ) {
                                     Text(text = stringResource(R.string.about_sponsor))
                                 }
@@ -175,7 +175,7 @@ fun AboutInfoScreen(
                             openLink = { openLink(URL_MCMOD) }
                         )
                         ButtonIconItem(
-                            icon = painterResource(R.drawable.img_mcim),
+                            icon = painterResource(R.drawable.img_avatar_mcim),
                             title = "mcmod-info-mirror",
                             text = stringResource(R.string.about_acknowledgements_mcim_text, BuildKeys.LAUNCHER_SHORT_NAME),
                             button = {
@@ -207,7 +207,7 @@ fun AboutInfoScreen(
                             useImage = false
                         )
                         LinkIconItem(
-                            icon = painterResource(R.drawable.img_weblate),
+                            icon = painterResource(R.drawable.img_platform_weblate),
                             title = stringResource(R.string.about_acknowledgements_weblate_community),
                             text = stringResource(R.string.about_acknowledgements_weblate_community_text),
                             openLink = { openLink(URL_WEBLATE) }

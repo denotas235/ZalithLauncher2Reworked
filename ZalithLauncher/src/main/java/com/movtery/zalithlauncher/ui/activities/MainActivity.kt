@@ -63,6 +63,7 @@ import com.movtery.zalithlauncher.ui.screens.main.crashlogs.LogShareMenuOperatio
 import com.movtery.zalithlauncher.ui.screens.main.crashlogs.ShareLinkOperation
 import com.movtery.zalithlauncher.ui.theme.ZalithLauncherTheme
 import com.movtery.zalithlauncher.ui.theme.feativals.FestivalEffects
+import com.movtery.zalithlauncher.ui.theme.showThemed
 import com.movtery.zalithlauncher.ui.vulkan_checker.VCOperation
 import com.movtery.zalithlauncher.ui.vulkan_checker.VulkanChecker
 import com.movtery.zalithlauncher.upgrade.TooFrequentOperationException
@@ -642,7 +643,7 @@ class MainActivity : BaseAppCompatActivity() {
                 }
             }
 
-            builder.create().show()
+            builder.showThemed()
         }
     }
 
