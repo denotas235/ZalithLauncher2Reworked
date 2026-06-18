@@ -214,8 +214,8 @@ object AccountsManager {
         val currentAccount = getCurrentAccount()
         val isOffline = checkLimit()
         _currentAccountFlow.update {
-            //若处于非正版状态，不允许使用账号
-            if (isOffline) null else currentAccount
+            // Allow local (offline) accounts even when not in Greater China without Microsoft
+            if (isOffline && currentAccount?.accountType != AccountType.LOCAL.tag) null else currentAccount
         }
         _isOffline.update { isOffline }
     }
