@@ -23,6 +23,7 @@ import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.coroutine.Task
 import com.movtery.zalithlauncher.coroutine.TaskSystem
 import com.movtery.zalithlauncher.game.account.Account
+import com.movtery.zalithlauncher.game.account.AccountType
 import com.movtery.zalithlauncher.game.account.AccountsManager
 import com.movtery.zalithlauncher.game.account.auth_server.ResponseException
 import com.movtery.zalithlauncher.game.account.isLocalAccount
@@ -58,7 +59,10 @@ object LaunchGame {
         submitError: (ErrorViewModel.ThrowableMessage) -> Unit
     ) {
         if (isLaunching) return
-        val account = AccountsManager.currentAccountFlow.value ?: return
+        val account = AccountsManager.currentAccountFlow.value ?: Account(
+            username = "Steve",
+            accountType = AccountType.LOCAL.tag
+        )
         isLaunching = true
 
         //检查是否联网，根据这个条件决定是否登录账号
