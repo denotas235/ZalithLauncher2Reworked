@@ -243,11 +243,6 @@ fun LaunchGameOperation(
 
                 val quickPlay = launchGameOperation.quickPlay
 
-                AccountsManager.currentAccountFlow.value ?: run {
-                    updateOperation(LaunchGameOperation.NoAccount)
-                    return@LaunchedEffect
-                }
-
                 //开始检查渲染器的版本支持情况
                 Renderers.setCurrentRenderer(activity, version.getRenderer())
                 val currentRenderer = Renderers.getCurrentRenderer()
