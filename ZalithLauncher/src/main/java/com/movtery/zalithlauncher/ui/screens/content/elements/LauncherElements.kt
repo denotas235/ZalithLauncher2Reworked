@@ -137,7 +137,6 @@ fun LaunchGameOperation(
     launchGameOperation: LaunchGameOperation,
     updateOperation: (LaunchGameOperation) -> Unit,
     exitActivity: () -> Unit,
-    waitForVulkanChecker: suspend () -> Unit,
     submitError: (ErrorViewModel.ThrowableMessage) -> Unit,
     toAccountManageScreen: (FirstLoginMenu) -> Unit = {},
     toVersionManageScreen: () -> Unit = {}
@@ -301,7 +300,6 @@ fun LaunchGameOperation(
                     context = activity,
                     version = version,
                     exitActivity = exitActivity,
-                    waitForVulkanChecker = waitForVulkanChecker,
                     submitError = submitError
                 )
                 updateOperation(LaunchGameOperation.None)
