@@ -46,9 +46,18 @@ android {
 
     signingConfigs {
         create("releaseBuild") {
-android {
-    namespace = zalithPackageName
-    compileSdk = 37
+            storeFile = file("zalith_launcher.jks")
+            storePassword = getKeyFromLocal("STORE_PASSWORD", ".store_password.txt", defaultStorePassword)
+            keyAlias = "movtery_zalith"
+            keyPassword = getKeyFromLocal("KEY_PASSWORD", ".key_password.txt", defaultKeyPassword)
+        }
+        create("debugBuild") {
+            storeFile = file("zalith_launcher_debug.jks")
+            storePassword = defaultStorePassword
+            keyAlias = "movtery_zalith_debug"
+            keyPassword = defaultKeyPassword
+        }
+    }
 
     defaultConfig {
         applicationId = zalithPackageName
@@ -65,15 +74,30 @@ android {
         }
     }
 
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            signingConfig = signingConfigs.getByName("releaseBuild")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+        debug {
+            isMinifyEnabled = false
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+            signingConfig = signingConfigs.getByName("debugBuild")
+        }
+    }
+
     ndkVersion = "26.2.11394342"
 
     externalNativeBuild {
         ndkBuild {
             path = file("src/main/jni/Android.mk")
             arguments += listOf("NDK_APPLICATION_MK=src/main/jni/Application.mk")
-            // Se precisares de flags, usa os campos corretos do ndkBuild:
-            // cFlags += listOf(...)
-            // cppFlags += listOf(...)
         }
     }
 
@@ -83,7 +107,6 @@ android {
             pickFirsts += listOf("**/libbytehook.so", "**/libvulkan_checker.so")
         }
     }
-}
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
