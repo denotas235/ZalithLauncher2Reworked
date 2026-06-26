@@ -33,7 +33,9 @@ include $(CLEAR_VARS)
 LOCAL_LDLIBS := -ldl -llog -landroid -lvulkan
 LOCAL_MODULE := vulkan_checker
 LOCAL_SHARED_LIBRARIES := driver_helper
-LOCAL_SRC_FILES := vulkan_checker.c
+LOCAL_SRC_FILES := \
+    vulkan_checker.c \
+    turnip_loader.c
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/ctxbridges
 include $(BUILD_SHARED_LIBRARY)
 
