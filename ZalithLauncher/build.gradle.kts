@@ -68,7 +68,6 @@ android {
         versionName = launcherVersionName
         manifestPlaceholders["launcher_name"] = launcherAPPName
         
-        // Configurações para o NDK
         ndk {
             abiFilters.clear()
             abiFilters.addAll(listOf("arm64-v8a"))
@@ -113,12 +112,11 @@ android {
         }
     }
 
-    ndkVersion = "25.2.9519653"
+    ndkVersion = "26.2.11394342"
 
     externalNativeBuild {
         ndkBuild {
             path = file("src/main/jni/Android.mk")
-            // Garantir que o vulkan_checker seja compilado
             arguments.add("APP_BUILD_SCRIPT", file("src/main/jni/Android.mk").absolutePath)
             arguments.add("NDK_TOOLCHAIN_VERSION", "clang")
             arguments.add("APP_PLATFORM", "android-26")
