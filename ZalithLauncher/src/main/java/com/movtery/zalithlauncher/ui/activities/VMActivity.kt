@@ -81,6 +81,7 @@ import com.movtery.zalithlauncher.game.launch.handler.GameHandler
 import com.movtery.zalithlauncher.game.launch.handler.HandlerType
 import com.movtery.zalithlauncher.game.launch.handler.JVMHandler
 import com.movtery.zalithlauncher.game.multirt.RuntimesManager
+import com.movtery.zalithlauncher.game.plugin.driver.DriverPluginManager
 import com.movtery.zalithlauncher.game.version.installed.Version
 import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.terracotta.TerracottaVPNService
@@ -171,6 +172,28 @@ class VMViewModel : ViewModel() {
         exitListener: (Int, Boolean) -> Unit,
     ) {
         if (_session != null) return
+
+        // Verificação pré-launch para Modo Vulkan
+        if (bundle.getBoolean(INTENT_RUN_GAME)) {
+            val config: LaunchConfig = bundle.getParcelableSafely(INTENT_GAME_CONFIG, LaunchConfig::class.java)
+                ?: throw IllegalStateException("No launch config has been set.")
+            
+            // Verificar se o modo Vulkan está ativo e se o VulkanMod está presente
+            if (DriverPluginManager.isVulkanModeEnabled()) {
+                val modsDir = File(config.version.gameDir, "mods")
+                val vulkanModExists = modsDir.exists() && modsDir.listFiles()?.any { file ->
+                    file.name.startsWith("vulkanmod-", ignoreCase = true) &&
+                    file.name.endsWith(".jar", ignoreCase = true)
+                } ?: false
+                
+                if (!vulkanModExists) {
+                    // Lançar erro antes de continuar
+                    throw IllegalStateException(
+                        "Modo Vulkan ativo mas nenhum renderer Vulkan encontrado. Instale o VulkanMod na pasta mods."
+                    )
+                }
+            }
+        }
 
         _session = when {
             bundle.getBoolean(INTENT_RUN_GAME) -> {
@@ -343,25 +366,39 @@ class VMActivity : BaseAppCompatActivity(), SurfaceTextureListener, SurfaceHolde
 
         val bundle = intent.extras ?: throw IllegalStateException("Unknown VM launch state!")
 
-        vmViewModel.initSession(
-            activity = this,
-            bundle = bundle,
-            errorViewModel = errorViewModel,
-            eventViewModel = eventViewModel,
-            gamepadViewModel = gamepadViewModel,
-            exitListener = { exitCode: Int, isSignal: Boolean ->
-                stopAllService()
-                if (exitCode != 0) {
-                    val logPath = withLauncher {
-                        getLogFile().absolutePath
+        // Capturar erro do modo Vulkan
+        try {
+            vmViewModel.initSession(
+                activity = this,
+                bundle = bundle,
+                errorViewModel = errorViewModel,
+                eventViewModel = eventViewModel,
+                gamepadViewModel = gamepadViewModel,
+                exitListener = { exitCode: Int, isSignal: Boolean ->
+                    stopAllService()
+                    if (exitCode != 0) {
+                        val logPath = withLauncher {
+                            getLogFile().absolutePath
+                        }
+                        showExitMessage(this@VMActivity, exitCode, isSignal, logPath)
+                    } else {
+                        //重启启动器
+                        ProcessPhoenix.triggerRebirth(this@VMActivity)
                     }
-                    showExitMessage(this@VMActivity, exitCode, isSignal, logPath)
-                } else {
-                    //重启启动器
-                    ProcessPhoenix.triggerRebirth(this@VMActivity)
                 }
+            )
+        } catch (e: IllegalStateException) {
+            // Exibir erro de VulkanMod não encontrado
+            runOnUiThread {
+                Toast.makeText(
+                    this,
+                    e.message ?: "Erro ao iniciar o jogo",
+                    Toast.LENGTH_LONG
+                ).show()
             }
-        )
+            finish()
+            return
+        }
 
         //设置画面渲染输出回调
         CallbackBridge.setGraphicOutputListener {
