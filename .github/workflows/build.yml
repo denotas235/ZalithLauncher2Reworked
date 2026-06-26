@@ -44,6 +44,12 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: "25.2.9519653"
+          add-to-path: true
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -52,7 +58,7 @@ jobs:
       - name: Build APK for ${{ matrix.arch }}
         run: |
           chmod +x gradlew
-          ./gradlew ZalithLauncher:assemble${{ inputs.variant }} -Darch=${{ matrix.arch }}
+          ./gradlew ZalithLauncher:assemble${{ inputs.variant }} -Darch=${{ matrix.arch }} -Pandroid.ndkVersion=25.2.9519653
 
       - name: Upload Debug APK for ${{ matrix.arch }}
         if: inputs.variant == 'Debug'
@@ -61,3 +67,11 @@ jobs:
         with:
           name: debug apk (${{ matrix.arch }})
           path: ZalithLauncher/build/outputs/apk/debug/*.apk
+
+      - name: Upload Release APK for ${{ matrix.arch }}
+        if: inputs.variant == 'Release'
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: release apk (${{ matrix.arch }})
+          path: ZalithLauncher/build/outputs/apk/release/*.apk
