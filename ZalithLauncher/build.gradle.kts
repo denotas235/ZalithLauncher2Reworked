@@ -67,6 +67,18 @@ android {
         versionCode = launcherVersionCode
         versionName = launcherVersionName
         manifestPlaceholders["launcher_name"] = launcherAPPName
+        
+        // Configurações para o NDK
+        ndk {
+            abiFilters.clear()
+            abiFilters.addAll(listOf("arm64-v8a"))
+        }
+        
+        externalNativeBuild {
+            ndkBuild {
+                arguments.add("NDK_APPLICATION_MK", "src/main/jni/Application.mk")
+            }
+        }
     }
 
     buildTypes {
@@ -106,13 +118,17 @@ android {
     externalNativeBuild {
         ndkBuild {
             path = file("src/main/jni/Android.mk")
+            // Garantir que o vulkan_checker seja compilado
+            arguments.add("APP_BUILD_SCRIPT", file("src/main/jni/Android.mk").absolutePath)
+            arguments.add("NDK_TOOLCHAIN_VERSION", "clang")
+            arguments.add("APP_PLATFORM", "android-26")
         }
     }
 
     packaging {
         jniLibs {
             useLegacyPackaging = true
-            pickFirsts += listOf("**/libbytehook.so")
+            pickFirsts += listOf("**/libbytehook.so", "**/libvulkan_checker.so")
         }
     }
 
