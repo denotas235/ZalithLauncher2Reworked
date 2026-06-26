@@ -62,6 +62,11 @@ object AllSettings : SettingsRegistry() {
     val graphicsApi = enumSetting("graphicsApi", GraphicsApi.DEFAULT_OPENGL)
 
     /**
+     * Modo Vulkan API (NEXUS)
+     */
+    val vulkanMode = boolSetting("vulkanMode", false)
+
+    /**
      * 分辨率
      */
     val resolutionRatio = intSetting("resolutionRatio", 100, 25..300)
@@ -415,9 +420,9 @@ object AllSettings : SettingsRegistry() {
     val homePageURL = stringSetting("homePageURL", "")
 
     /**
-     * 启动器上次检查更新时，用户选择忽略的版本号
+     * 启动器上次检查更新的时间戳
      */
-    val lastIgnoredVersion = intSetting("lastIgnoredVersion", null)
+    val lastUpgradeCheck = longSetting("lastUpgradeCheck", 0L)
 
     /**
      * 启动器日志保留天数
