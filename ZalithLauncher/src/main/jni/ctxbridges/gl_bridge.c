@@ -20,7 +20,15 @@ static const char* g_LogTag = "GLBridge";
 static __thread gl_render_window_t* currentBundle;
 static EGLDisplay g_EglDisplay;
 
+// Variável global para controlar o modo Vulkan (definida em vulkan_checker.c)
+extern int g_vulkan_mode;
+
 bool gl_init() {
+    if (g_vulkan_mode) {
+        __android_log_print(ANDROID_LOG_INFO, g_LogTag, "Modo Vulkan ativo: gl_init pulado");
+        return true; // Retorna true para não bloquear o fluxo
+    }
+    
     dlsym_EGL();
     g_EglDisplay = eglGetDisplay_p(EGL_DEFAULT_DISPLAY);
 
@@ -57,6 +65,11 @@ static void gl4esi_get_display_dimensions(int* width, int* height) {
 }
 
 gl_render_window_t* gl_init_context(gl_render_window_t *share) {
+    if (g_vulkan_mode) {
+        __android_log_print(ANDROID_LOG_INFO, g_LogTag, "Modo Vulkan ativo: gl_init_context pulado");
+        return NULL; // Retorna NULL para indicar que o contexto GL não foi criado
+    }
+    
     gl_render_window_t* bundle = malloc(sizeof(gl_render_window_t));
     memset(bundle, 0, sizeof(gl_render_window_t));
     EGLint egl_attributes[] = { EGL_BLUE_SIZE, 8,
@@ -121,6 +134,11 @@ gl_render_window_t* gl_init_context(gl_render_window_t *share) {
 }
 
 void gl_swap_surface(gl_render_window_t* bundle) {
+    if (g_vulkan_mode) {
+        __android_log_print(ANDROID_LOG_INFO, g_LogTag, "Modo Vulkan ativo: gl_swap_surface pulado");
+        return;
+    }
+    
     // 有新 Surface 待切换，这里直接切换
     if (bundle->newNativeSurface != NULL)
     {
@@ -170,7 +188,11 @@ void gl_swap_surface(gl_render_window_t* bundle) {
 }
 
 void gl_make_current(gl_render_window_t* bundle) {
-
+    if (g_vulkan_mode) {
+        __android_log_print(ANDROID_LOG_INFO, g_LogTag, "Modo Vulkan ativo: gl_make_current pulado");
+        return;
+    }
+    
     if (bundle == NULL)
     {
         if (eglMakeCurrent_p(g_EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT))
@@ -204,10 +226,14 @@ void gl_make_current(gl_render_window_t* bundle) {
         }
         __android_log_print(ANDROID_LOG_ERROR, g_LogTag, "eglMakeCurrent returned with error: %04x", eglGetError_p());
     }
-
 }
 
 void gl_swap_buffers() {
+    if (g_vulkan_mode) {
+        __android_log_print(ANDROID_LOG_INFO, g_LogTag, "Modo Vulkan ativo: gl_swap_buffers pulado");
+        return;
+    }
+    
     if (currentBundle->state == STATE_RENDERER_NEW_WINDOW)
     {
         eglMakeCurrent_p(g_EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
@@ -229,10 +255,14 @@ void gl_swap_buffers() {
             }
             __android_log_print(ANDROID_LOG_INFO, g_LogTag, "The window has died, awaiting window change");
         }
-
 }
 
 void gl_setup_window() {
+    if (g_vulkan_mode) {
+        __android_log_print(ANDROID_LOG_INFO, g_LogTag, "Modo Vulkan ativo: gl_setup_window pulado");
+        return;
+    }
+    
     if (pojav_environ->mainWindowBundle != NULL)
     {
         __android_log_print(ANDROID_LOG_INFO, g_LogTag, "Main window bundle is not NULL, changing state");
@@ -242,12 +272,22 @@ void gl_setup_window() {
 }
 
 void gl_swap_interval(int swapInterval) {
+    if (g_vulkan_mode) {
+        __android_log_print(ANDROID_LOG_INFO, g_LogTag, "Modo Vulkan ativo: gl_swap_interval pulado");
+        return;
+    }
+    
     eglSwapInterval_p(g_EglDisplay, swapInterval);
 }
 
 JNIEXPORT void JNICALL
 Java_org_lwjgl_opengl_PojavRendererInit_nativeInitGl4esInternals(JNIEnv *env, jclass clazz,
                                                             jobject function_provider) {
+    if (g_vulkan_mode) {
+        __android_log_print(ANDROID_LOG_INFO, g_LogTag, "Modo Vulkan ativo: nativeInitGl4esInternals pulado");
+        return;
+    }
+    
     __android_log_print(ANDROID_LOG_INFO, g_LogTag, "GL4ES internals initializing...");
     jclass funcProviderClass = (*env)->GetObjectClass(env, function_provider);
     jmethodID method_getFunctionAddress = (*env)->GetMethodID(env, funcProviderClass, "getFunctionAddress", "(Ljava/lang/CharSequence;)J");
@@ -261,4 +301,3 @@ Java_org_lwjgl_opengl_PojavRendererInit_nativeInitGl4esInternals(JNIEnv *env, jc
 
 #undef GETSYM
 }
-
