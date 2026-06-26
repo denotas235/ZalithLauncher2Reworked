@@ -19,6 +19,7 @@
 package com.movtery.zalithlauncher.game.renderer
 
 import android.content.Context
+import com.movtery.zalithlauncher.game.plugin.driver.DriverPluginManager
 import com.movtery.zalithlauncher.game.renderer.renderers.FreedrenoRenderer
 import com.movtery.zalithlauncher.game.renderer.renderers.GL4ESRenderer
 import com.movtery.zalithlauncher.game.renderer.renderers.NGGL4ESRenderer
@@ -60,6 +61,11 @@ object Renderers {
             FreedrenoRenderer,
             PanfrostRenderer
         )
+        
+        // Adicionar renderer Vulkan se o modo Vulkan estiver ativo
+        if (DriverPluginManager.isVulkanModeEnabled()) {
+            addRenderer(VulkanRenderer)
+        }
     }
 
     /**
@@ -145,4 +151,44 @@ object Renderers {
      * 当前是否设置了渲染器
      */
     fun isCurrentRendererValid(): Boolean = isInitialized && currentRenderer != null
+    
+    /**
+     * Define o renderer Vulkan como atual
+     */
+    fun setVulkanRenderer() {
+        currentRenderer = VulkanRenderer
+    }
+    
+    /**
+     * Verifica se o renderer Vulkan está selecionado
+     */
+    fun isVulkanRendererSelected(): Boolean {
+        return currentRenderer?.getRendererId() == "vulkan"
+    }
+}
+
+/**
+ * Renderer Vulkan nativo para o Modo Vulkan
+ */
+val VulkanRenderer = object : RendererInterface {
+    override fun getRendererId(): String = "vulkan"
+    
+    override fun getRendererName(): String = "Vulkan API (Nativo)"
+    
+    override fun getRendererSummary(): String? = "Renderer Vulkan nativo do sistema (Mali-G52)"
+    
+    override fun getRendererLibrary(): String? = null // Não precisa de lib externa
+    
+    override fun getRendererEGL(): String? = null // Não usa EGL
+    
+    override fun getRendererEnv(): Map<String, String> = mapOf(
+        "POJAV_RENDERER" to "vulkan",
+        "glfwstub.initEgl" to "false"
+    )
+    
+    override fun getUniqueIdentifier(): String = "vulkan_native"
+    
+    override fun isVulkan(): Boolean = true
+    
+    override fun isAvailable(): Boolean = true
 }
