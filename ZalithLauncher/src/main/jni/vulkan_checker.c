@@ -13,6 +13,29 @@
 static jobject g_logCallback = NULL;
 static jmethodID g_logMethod = NULL;
 
+// Variável global para controlar o modo Vulkan (1 = ativo, 0 = desativado)
+int g_vulkan_mode = 0;
+
+// Função para definir o modo Vulkan a partir do Java
+JNIEXPORT void JNICALL
+Java_com_movtery_zalithlauncher_utils_device_VulkanChecker_nativeSetVulkanMode(
+        JNIEnv *env,
+        jclass clazz,
+        jboolean enabled
+) {
+    g_vulkan_mode = enabled ? 1 : 0;
+    __android_log_print(ANDROID_LOG_INFO, "VulkanChecker", "Modo Vulkan %s", enabled ? "ativo" : "desativado");
+}
+
+// Função para obter o modo Vulkan atual
+JNIEXPORT jboolean JNICALL
+Java_com_movtery_zalithlauncher_utils_device_VulkanChecker_nativeIsVulkanModeEnabled(
+        JNIEnv *env,
+        jclass clazz
+) {
+    return g_vulkan_mode ? JNI_TRUE : JNI_FALSE;
+}
+
 static void vulkan_log(JNIEnv *env, const char *level, const char *fmt, ...) {
     if (!g_logCallback || !g_logMethod || !env) return;
 
