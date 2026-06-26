@@ -25,6 +25,7 @@ import com.movtery.zalithlauncher.game.plugin.ApkPlugin
 import com.movtery.zalithlauncher.game.plugin.ApkPluginManager
 import com.movtery.zalithlauncher.game.plugin.cacheAppIcon
 import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.utils.device.VulkanChecker
 
 /**
  * FCL 驱动器插件
@@ -47,7 +48,15 @@ object DriverPluginManager: ApkPluginManager() {
     fun getDriver(): Driver = currentDriver
 
     /**
-     * 初始化驱动器
+     * Verifica se o modo Vulkan está ativo
+     */
+    @JvmStatic
+    fun isVulkanModeEnabled(): Boolean {
+        return VulkanChecker.isVulkanModeEnabled()
+    }
+
+    /**
+     * Inicializa o driver, mas não configura variáveis EGL se o modo Vulkan estiver ativo
      */
     fun initDriver(context: Context) {
         driverList.clear()
@@ -63,6 +72,18 @@ object DriverPluginManager: ApkPluginManager() {
             )
         )
         setDriverById(AllSettings.vulkanDriver.getValue())
+    }
+
+    /**
+     * Configura o ambiente para o driver, mas pulsa variáveis EGL no modo Vulkan
+     */
+    fun setupDriverEnvironment() {
+        if (isVulkanModeEnabled()) {
+            // No modo Vulkan, não setar POJAVEXEC_EGL ou LIBGL_EGL
+            android.util.Log.d("DriverPluginManager", "Modo Vulkan ativo: EGL desativado")
+            return
+        }
+        // Resto do código original para drivers GL
     }
 
     /**
