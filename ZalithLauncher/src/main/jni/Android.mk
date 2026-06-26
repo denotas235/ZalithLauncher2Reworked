@@ -13,10 +13,10 @@ LOCAL_PATH := $(HERE_PATH)
 
 
 include $(CLEAR_VARS)
-LOCAL_LDLIBS := -ldl -llog -landroid
+LOCAL_LDLIBS := -ldl -llog -landroid -lvulkan
 LOCAL_MODULE := pojavexec
 LOCAL_SHARED_LIBRARIES := driver_helper
-LOCAL_CFLAGS += -rdynamic
+LOCAL_CFLAGS += -rdynamic -DADRENO_POSSIBLE
 LOCAL_SRC_FILES := \
     bigcoreaffinity.c \
     egl_bridge.c \
@@ -36,6 +36,8 @@ LOCAL_SRC_FILES := \
     java_exec_hooks.c \
     lwjgl_dlopen_hook.c
 
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/ctxbridges
+
 ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
 LOCAL_CFLAGS += -DADRENO_POSSIBLE
 LOCAL_LDLIBS += -lEGL -lGLESv2
@@ -44,21 +46,18 @@ include $(BUILD_SHARED_LIBRARY)
 
 
 include $(CLEAR_VARS)
-LOCAL_LDLIBS := -ldl -llog
-LOCAL_MODULE := vulkan_check
+LOCAL_LDLIBS := -ldl -llog -lvulkan
+LOCAL_MODULE := vulkan_checker
 LOCAL_SHARED_LIBRARIES := driver_helper
 LOCAL_SRC_FILES := vulkan_checker.c
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/ctxbridges
 include $(BUILD_SHARED_LIBRARY)
-
-ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
-LOCAL_CFLAGS += -DADRENO_POSSIBLE
-endif
 
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := exithook
 LOCAL_LDLIBS := -ldl -llog
-LOCAL_SHARED_LIBRARIES := bytehook pojavexec
+LOCAL_SHARED_LIBRARIES := bytehook pojavexec vulkan_checker
 LOCAL_SRC_FILES := exit_hook.c
 include $(BUILD_SHARED_LIBRARY)
 
@@ -110,4 +109,3 @@ include $(BUILD_SHARED_LIBRARY)
 
 # delete fake libs after linked
 $(info $(shell (rm $(HERE_PATH)/../jniLibs/*/libawt_headless.so)))
-
