@@ -44,13 +44,13 @@ import com.movtery.zalithlauncher.game.renderer.Renderers
 import com.movtery.zalithlauncher.game.support.touch_controller.ControllerProxy
 import com.movtery.zalithlauncher.game.version.installed.Version
 import com.movtery.zalithlauncher.game.version.installed.VersionInfoParser
-import com.movtery.zalithlauncher.game.version.installed.VersionsManager
 import com.movtery.zalithlauncher.game.versioninfo.models.GameManifest
 import com.movtery.zalithlauncher.path.LibPath
 import com.movtery.zalithlauncher.path.PathManager
 import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.utils.GSON
 import com.movtery.zalithlauncher.utils.device.Architecture
+import com.movtery.zalithlauncher.utils.device.VulkanChecker
 import com.movtery.zalithlauncher.utils.file.child
 import com.movtery.zalithlauncher.utils.file.ensureDirectorySilently
 import com.movtery.zalithlauncher.utils.logging.Logger
@@ -168,9 +168,19 @@ class GameLauncher(
         version.getVersionInfo()?.loaderInfo?.getLoaderEnvKey()?.let { loaderKey ->
             envMap[loaderKey] = "1"
         }
-        if (Renderers.isCurrentRendererValid()) {
-            setRendererEnv(envMap)
+        
+        // Configuração para Modo Vulkan
+        if (DriverPluginManager.isVulkanModeEnabled()) {
+            envMap["glfwstub.initEgl"] = "false"
+            envMap["POJAV_RENDERER"] = "vulkan"
+            // Não setar POJAVEXEC_EGL ou LIBGL_EGL no modo Vulkan
+            append("▷ Modo Vulkan ativo: EGL desativado")
+        } else {
+            if (Renderers.isCurrentRendererValid()) {
+                setRendererEnv(envMap)
+            }
         }
+        
         envMap["ZALITH_VERSION_CODE"] = BuildConfig.VERSION_CODE.toString()
         return envMap
     }
@@ -179,7 +189,7 @@ class GameLauncher(
         super.dlopenEngine()
         appendTitle("DLOPEN Renderer")
 
-        //声音引擎加载后，dlopen渲染器的库
+        // som引擎加载后，dlopen渲染器的库
         RendererPluginManager.selectedRendererPlugin?.let { renderer ->
             renderer.dlopen.forEach { lib -> ZLBridge.dlopen("${renderer.path}/$lib") }
         }
@@ -194,6 +204,12 @@ class GameLauncher(
         super.progressFinalUserArgs(args, version.getRamAllocation(activity))
         if (Renderers.isCurrentRendererValid()) {
             args.add("-Dorg.lwjgl.opengl.libname=${loadGraphicsLibrary()}")
+        }
+        
+        // Adicionar argumento para VulkanMod
+        if (DriverPluginManager.isVulkanModeEnabled()) {
+            args.add("-Dorg.lwjgl.vulkan.libname=libvulkan.so")
+            append("▷ VulkanMod: libvulkan.so disponibilizado")
         }
     }
 
@@ -227,6 +243,19 @@ class GameLauncher(
                 getCacioJavaArgs(screenSize, isJava8)
             }
         ).getAllArgs()
+
+        // Log de telemetria expandida para Modo Vulkan
+        if (DriverPluginManager.isVulkanModeEnabled()) {
+            val vulkanInfo = VulkanChecker.getVulkanInfo()
+            if (vulkanInfo != null) {
+                append("▷ Vulkan API: ${vulkanInfo.major}.${vulkanInfo.minor}.${vulkanInfo.patch}")
+                append("▷ GPU: ${vulkanInfo.gpuName}")
+                append("▷ Driver version: ${vulkanInfo.driverVersion}")
+                append("▷ Extensions carregadas: ${vulkanInfo.extensionsCount}")
+                append("▷ EGL: DESATIVADO (Modo Vulkan)")
+                append("▷ Renderer detectado: VulkanMod")
+            }
+        }
 
         tryStartTouchProxy()
 
@@ -468,7 +497,7 @@ private fun getDetectedVersion(): Int {
                             Logger.warning(TAG,
                                 ("Getting config attribute with "
                                         + "EGL10#eglGetConfigAttrib failed "
-                                        + "(" + i + "/" + numConfigs[0] + "): "
+                                        + "(" + i + "/" + numConfigs[0] + ") : "
                                         + egl.eglGetError())
                             )
                         }
