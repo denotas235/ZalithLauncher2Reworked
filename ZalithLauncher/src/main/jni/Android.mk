@@ -12,6 +12,23 @@ $(call import-module,prefab/bytehook)
 LOCAL_PATH := $(HERE_PATH)
 
 
+# Build driver_helper first (dependency for vulkan_checker and pojavexec)
+include $(CLEAR_VARS)
+LOCAL_LDLIBS := -ldl -llog -landroid
+LOCAL_MODULE := driver_helper
+LOCAL_SRC_FILES := \
+    driver_helper/driver_helper.c \
+    driver_helper/nsbypass.c
+LOCAL_CFLAGS += -g -rdynamic
+
+ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+LOCAL_CFLAGS += -DADRENO_POSSIBLE
+LOCAL_LDLIBS += -lEGL -lGLESv2
+endif
+include $(BUILD_SHARED_LIBRARY)
+
+
+# Build vulkan_checker (depends on driver_helper)
 include $(CLEAR_VARS)
 LOCAL_LDLIBS := -ldl -llog -landroid -lvulkan
 LOCAL_MODULE := vulkan_checker
@@ -21,6 +38,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/ctxbridges
 include $(BUILD_SHARED_LIBRARY)
 
 
+# Build pojavexec (depends on driver_helper and vulkan_checker)
 include $(CLEAR_VARS)
 LOCAL_LDLIBS := -ldl -llog -landroid -lvulkan
 LOCAL_MODULE := pojavexec
@@ -59,21 +77,6 @@ LOCAL_MODULE := exithook
 LOCAL_LDLIBS := -ldl -llog
 LOCAL_SHARED_LIBRARIES := bytehook pojavexec vulkan_checker
 LOCAL_SRC_FILES := exit_hook.c
-include $(BUILD_SHARED_LIBRARY)
-
-
-include $(CLEAR_VARS)
-LOCAL_LDLIBS := -ldl -llog -landroid
-LOCAL_MODULE := driver_helper
-LOCAL_SRC_FILES := \
-    driver_helper/driver_helper.c \
-    driver_helper/nsbypass.c
-LOCAL_CFLAGS += -g -rdynamic
-
-ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
-LOCAL_CFLAGS += -DADRENO_POSSIBLE
-LOCAL_LDLIBS += -lEGL -lGLESv2
-endif
 include $(BUILD_SHARED_LIBRARY)
 
 
