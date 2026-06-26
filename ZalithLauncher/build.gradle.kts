@@ -46,18 +46,9 @@ android {
 
     signingConfigs {
         create("releaseBuild") {
-            storeFile = file("zalith_launcher.jks")
-            storePassword = getKeyFromLocal("STORE_PASSWORD", ".store_password.txt")
-            keyAlias = "movtery_zalith"
-            keyPassword = getKeyFromLocal("KEY_PASSWORD", ".key_password.txt")
-        }
-        create("debugBuild") {
-            storeFile = file("zalith_launcher_debug.jks")
-            storePassword = defaultStorePassword
-            keyAlias = "movtery_zalith_debug"
-            keyPassword = defaultKeyPassword
-        }
-    }
+android {
+    namespace = zalithPackageName
+    compileSdk = 37
 
     defaultConfig {
         applicationId = zalithPackageName
@@ -67,48 +58,10 @@ android {
         versionCode = launcherVersionCode
         versionName = launcherVersionName
         manifestPlaceholders["launcher_name"] = launcherAPPName
-        
+
         ndk {
             abiFilters.clear()
-            abiFilters.addAll(listOf("arm64-v8a"))
-        }
-        
-        externalNativeBuild {
-            ndkBuild {
-                arguments.add("NDK_APPLICATION_MK", "src/main/jni/Application.mk")
-            }
-        }
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            signingConfig = signingConfigs.getByName("releaseBuild")
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-        debug {
-            isMinifyEnabled = false
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
-            signingConfig = signingConfigs.getByName("debugBuild")
-        }
-    }
-
-    splits {
-        val arch = projectArch.takeIf { it != "all" } ?: return@splits
-        abi {
-            isEnable = true
-            reset()
-            when (arch) {
-                "arm" -> include("armeabi-v7a")
-                "arm64" -> include("arm64-v8a")
-                "x86" -> include("x86")
-                "x86_64" -> include("x86_64")
-            }
+            abiFilters.add("arm64-v8a")
         }
     }
 
@@ -117,9 +70,10 @@ android {
     externalNativeBuild {
         ndkBuild {
             path = file("src/main/jni/Android.mk")
-            arguments.add("APP_BUILD_SCRIPT", file("src/main/jni/Android.mk").absolutePath)
-            arguments.add("NDK_TOOLCHAIN_VERSION", "clang")
-            arguments.add("APP_PLATFORM", "android-26")
+            arguments += listOf("NDK_APPLICATION_MK=src/main/jni/Application.mk")
+            // Se precisares de flags, usa os campos corretos do ndkBuild:
+            // cFlags += listOf(...)
+            // cppFlags += listOf(...)
         }
     }
 
@@ -129,6 +83,7 @@ android {
             pickFirsts += listOf("**/libbytehook.so", "**/libvulkan_checker.so")
         }
     }
+}
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
