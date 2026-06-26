@@ -47,7 +47,7 @@ jobs:
       - name: Setup Android NDK
         uses: nttld/setup-ndk@v1
         with:
-          ndk-version: "26.2.11394342"
+          ndk-version: "r26c"
           add-to-path: true
 
       - name: Setup Gradle
@@ -58,7 +58,7 @@ jobs:
       - name: Build APK for ${{ matrix.arch }}
         run: |
           chmod +x gradlew
-          ./gradlew ZalithLauncher:assemble${{ inputs.variant }} -Darch=${{ matrix.arch }} -Pandroid.ndkVersion=26.2.11394342
+          ./gradlew ZalithLauncher:assemble${{ inputs.variant }} -Darch=${{ matrix.arch }} -Pandroid.ndkVersion=r26c
 
       - name: Upload Debug APK for ${{ matrix.arch }}
         if: inputs.variant == 'Debug'
